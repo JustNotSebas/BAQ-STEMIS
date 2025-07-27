@@ -1,0 +1,329 @@
+#define s0       A0
+#define s1       A1
+#define s2       A2
+#define s3       A3
+#define s4       A4
+#define s5       A5
+#define s6       A6
+#define s7       A7
+#define LED_ON   13
+#define LED       3
+#define BOTON     2
+#define PINBUZZER 12
+
+//pines motores
+#define  pwma  5
+#define  der1  7
+#define  der2  6
+#define  pwmb  11
+#define  izq1  9
+#define  izq2  10 
+#define  STBY  8
+
+//int umbral = 120;
+float digital[8];
+float sensores[8];
+float lectura_fondo[8];
+float lectura_linea[8];
+float umbral[8];
+
+long int sumap, suma, pos, poslast, position;
+
+//////////////////////PID////////////////////////
+const float KP = 0.12;
+const float KI = 0.0057;
+const float KD = 1;
+const float KV = 6.5;
+
+int vmin = 100;
+int vmax = 115;
+int veladelante = 160;
+int velatras = 115;
+int vbase;
+/////////////////////////////////////////////////
+
+//////////DATOS PARA LA INTEGRAL///////////////
+int error1 = 0;
+int error2 = 0;
+int error3 = 0;
+int error4 = 0;
+int error5 = 0;
+int error6 = 0;
+/////////////////////////////////////////////////
+
+/////////////////VARIABLES PID///////////////////
+int proporcional = 0;
+int integral = 0;
+int derivativo = 0;
+int diferencial = 0;
+int last_prop;
+int setpoint = 350;
+
+/////////////////////////////////////////////////
+
+int m = 0; //marañita
+float times = 235;
+
+unsigned long startTime = 0;  // Variable para guardar el tiempo de inicio
+bool giro = false;
+
+void setup() {
+
+  pinMode(der1, OUTPUT);
+  pinMode(der2, OUTPUT);
+  pinMode(izq1, OUTPUT);
+  pinMode(izq2, OUTPUT);
+
+ //Serial.begin(9600);
+  pinMode(s0, INPUT);
+  pinMode(s1, INPUT);
+  pinMode(s2, INPUT);
+  pinMode(s3, INPUT);
+  pinMode(s4, INPUT);
+  pinMode(s5, INPUT);
+  pinMode(s6, INPUT);
+  pinMode(s7, INPUT);
+  pinMode(LED, OUTPUT);
+  pinMode(LED_ON, OUTPUT);
+  pinMode(BOTON, INPUT);
+
+  digitalWrite(LED_ON, HIGH);
+
+  digitalWrite(LED, 1);
+  while (digitalRead(BOTON));
+  tone(PINBUZZER, 2000, 100);
+  delay(200); 
+  for(int i = 0; i < 50; i++){
+    fondos();
+    digitalWrite(LED, 0);
+    delay(20);
+    digitalWrite(LED, 1);
+    delay(20);
+  }
+  tone(PINBUZZER, 2000, 100);
+  delay(200); 
+  while (digitalRead(BOTON));
+  tone(PINBUZZER, 2000, 100);
+  delay(200); 
+  for(int i = 0; i < 50; i++){
+    lineas();
+    digitalWrite(LED, 0);
+    delay(20);
+    digitalWrite(LED, 1);
+    delay(20);
+  }
+  promedio();
+  tone(PINBUZZER, 2000, 100);
+  delay(200); 
+  while (digitalRead(BOTON));
+  tone(PINBUZZER, 2000, 100);
+  delay(200); 
+  digitalWrite(LED, 0);
+  delay(1000);
+  digitalWrite(STBY,HIGH);
+  startTime = millis();  // Registrar el tiempo de inicio
+}
+
+void loop() {
+  //position = lectura();
+//Serial.println(position);
+  lectura();
+  if(interseccion()){
+    pararMotores();
+    tomarDecision();
+    } 
+  else{
+    PID(); 
+    frenos();
+  }
+}
+  unsigned long currentTime = millis();  // Tiempo actual
+   // Baja velocidad en la primera parte del recorrido (800 ms después del inicio)
+  if (currentTime - startTime >= 800 && currentTime - startTime < 2000) {
+    vmin = 90;
+    vmax = 95;
+  }
+
+  // Intersección en V: activa giro y ajusta velocidad (2000 ms después del inicio)
+  if (currentTime - startTime >= 2000 && currentTime - startTime < 6100) {
+    giro = true;  // Marcar que el giro está activo
+    vmin = 85;
+    vmax = 95;
+  }
+
+  // Turbo en la recta (6400 ms después del inicio)
+  if (currentTime - startTime >= 6100 && currentTime - startTime < 6150) {
+    vmin = 100;
+    vmax = 105;
+  }
+  
+  
+}
+
+void fondos(){
+  lectura_fondo[0] = analogRead(s0);
+  lectura_fondo[1] = analogRead(s1);
+  lectura_fondo[2] = analogRead(s2);
+  lectura_fondo[3] = analogRead(s3);
+  lectura_fondo[4] = analogRead(s4);
+  lectura_fondo[5] = analogRead(s5);
+  lectura_fondo[6] = analogRead(s6);
+  lectura_fondo[7] = analogRead(s7);
+}
+
+void lineas(){
+  lectura_linea[0] = analogRead(s0);
+  lectura_linea[1] = analogRead(s1);
+  lectura_linea[2] = analogRead(s2);
+  lectura_linea[3] = analogRead(s3);
+  lectura_linea[4] = analogRead(s4);
+  lectura_linea[5] = analogRead(s5);
+  lectura_linea[6] = analogRead(s6);
+  lectura_linea[7] = analogRead(s7);
+}
+
+void promedio(){
+  for(int i = 0; i < 8; i++){
+    umbral[i]= (lectura_fondo[i]+ lectura_linea[i])/2;
+  }
+}
+
+int lectura(void){
+  sensores[0] = analogRead(s0);
+  sensores[1] = analogRead(s1);
+  sensores[2] = analogRead(s2);
+  sensores[3] = analogRead(s3);
+  sensores[4] = analogRead(s4);
+  sensores[5] = analogRead(s5);
+  sensores[6] = analogRead(s6);
+  sensores[7] = analogRead(s7);
+  
+  for(int i = 0; i < 8; i++){
+    if (sensores[i]<= umbral[i]){
+      digital[i] = 0;
+    }
+    else{digital[i] =1;}
+    //Serial.print(digital[i]);
+    //Serial.print("\t");
+  }
+  //Serial.println(" ");
+
+  sumap = (700*digital[0] + 600*digital[1] + 500*digital[2] + 400*digital[3] + 300*digital[4] + 200*digital[5] + 100*digital[6] + 0*digital[7]);  
+  suma = (digital[0] + digital[1] + digital[2] + digital[3] + digital[4] + digital[5] + digital[6] + digital[7]);  
+  pos = (sumap / suma);
+
+  if(poslast <= 100 && pos == -1){
+    pos = 0;
+  }
+  if(poslast >= 700 && pos == -1){
+    pos = 750;
+  }
+  poslast = pos;
+  
+  return pos;
+}
+
+void PID(){
+  proporcional = pos - setpoint;
+  derivativo = proporcional - last_prop;
+  integral = error1 + error2 + error3 + error4 + error5 + error6;
+  last_prop = proporcional;
+  error6 = error5;
+  error5 = error4;
+  error4 = error3;
+  error3 = error2;
+  error2 = error1;
+  error1 = proporcional;
+
+  if((proporcional*integral)<0) integral = 0;
+  diferencial = (proporcional * KP) + (derivativo * KD) + (integral * KI);
+  
+  vbase = vmin+(vmax-vmin)*exp(-KV*abs(KP*proporcional));
+  motores(vbase+diferencial, vbase-diferencial);
+}
+
+void frenos(){
+  if (pos <= 100){
+    digitalWrite(STBY,HIGH);
+    motores(veladelante, -velatras);
+  }
+  if (pos >= 600){
+    digitalWrite(STBY,HIGH);
+    motores(-velatras, veladelante);
+  }
+}
+
+bool interseccion(){
+  int lineasDetectadas = 0;
+  for(int i = 0; i < 8; i++){
+    if (sensores[i] > umbral[i]){
+      lineasDetectadas++;
+    }
+  }
+
+  //dar que es una interseccion si se detectan 4 sensores
+  return lineasDetectadas >= 4;
+}
+
+//funcion para actuar en intersecciones
+void tomarDecision(){
+  if (sensores[7] > umbral[7]) { //Linea derecha
+    girarIzquierda();
+  }
+  else if (sensores[0] > umbral[0]){ //Linea izquierda
+    girarDerecha();
+  }
+  else { //No hay giro
+    seguirRecto();
+  }
+}
+
+//Tomas decision pero namas gira a la derecha
+// Sebas note: Esto sirve cuando hay que forzar algun giro planeado para agarrar un camino facil
+// Comentado para futuro uso >:3
+//void tomarDecisionM(){
+//  if (sensores[7] > umbral[7]) { //Linea derecha
+//    girarDerecha();
+//  }
+//  else if (sensores[0] > umbral[0]){ //Linea izquierda
+//    girarDerecha();
+//  }
+//  else { //No hay giro
+//    seguirRecto();
+//  }
+//}
+
+void seguirRecto(){
+  motores(vmin, vmin);
+}
+
+void girarDerecha(){
+  motores(-120, 170);
+  delay(times);
+}
+
+void girarIzquierda(){
+  motores(170, -100);
+  delay(times);
+}
+
+void pararMotores() {
+  motores(0, 0);  // Detener ambos motores
+}
+
+
+
+void motores(int izq, int der){
+  
+  izq = constrain(izq, -255, 255);
+  der = constrain(der, -255, 255);
+
+  digitalWrite(izq2, izq<0);
+  digitalWrite(izq1, izq>=0); 
+  analogWrite(pwma, abs(izq));
+
+  digitalWrite(der2, der<0);
+  digitalWrite(der1, der>=0);
+  analogWrite(pwmb, abs(der));
+  
+}
