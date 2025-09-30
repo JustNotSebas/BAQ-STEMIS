@@ -30,6 +30,6 @@ void pararMotores() {
 }
 
 void frenos(float pos) {
-  if (pos <= 120) motores(veladelante, -velatras);
-  else if (pos >= 580) motores(-velatras, veladelante);
+  if (pos <= 120) motores(fvup, -fvdown);
+  else if (pos >= 580) motores(-fvdown, fvup);
 }

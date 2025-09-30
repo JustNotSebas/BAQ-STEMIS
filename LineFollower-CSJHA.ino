@@ -4,6 +4,7 @@
 #include "PIDControl.h"
 #include "Motors.h"
 #include "Intersections.h"
+#include "ROM.h" 
 
 void setup() {
   // --- Pines ---
@@ -15,9 +16,13 @@ void setup() {
   pinMode(BOTON, INPUT_PULLUP);
   pinMode(PINBUZZER, OUTPUT);
 
+
   for (int i = 0; i < 8; i++) pinMode(A0 + i, INPUT);
 
   Serial.begin(115200);
+  loadEEPROM();
+  
+  tone(PINBUZZER, 2000, 100);
   digitalWrite(LED_ON, HIGH);
 
   // --- Calibración ---
@@ -40,6 +45,7 @@ void setup() {
 }
 
 void loop() {
+  readSerial();
   float pos = leerSensores();
 
   if (detectarInterseccion()) {

@@ -8,18 +8,18 @@ float umbral[8];
 uint8_t digital[8];
 
 // --- Variables PID ---
-float KP = 0.18;
-float KI = 0.002;
-float KD = 0.7;
-float KV = 7.0;
+float KP = KPDF;
+float KI = KIDF;
+float KD = KDDF;
+float KV = KVDF;
 float PID_integral = 0, PID_prev_error = 0, PID_derivative = 0;
 float setpoint = 350.0;
 
 // --- Motores ---
-int vmin = 70;
-int vmax = 80;
-int veladelante = 150;
-int velatras = 110;
+int vmin = VMINDF;
+int vmax = VMAXDF;
+int fvup = FVUPDF;
+int fvdown = FVDOWNDF;
 int vbase;
 float last_pos = 350.0;
 

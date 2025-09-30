@@ -41,8 +41,20 @@ extern float KP, KI, KD, KV;
 extern float PID_integral, PID_prev_error, PID_derivative;
 extern float setpoint;
 
+// PID defaults
+const float KPDF = 0.18;
+const float KIDF = 0.002;
+const float KDDF = 0.7;
+const float KVDF = 7.0;
+
+// Motores defaults
+const int VMINDF = 70;
+const int VMAXDF = 80;
+const int FVUPDF = 150;
+const int FVDOWNDF = 110;
+
 // Motores
-extern int vmin, vmax, veladelante, velatras, vbase;
+extern int vmin, vmax, fvup, fvdown, vbase;
 extern float last_pos;
 
 // Intersección
