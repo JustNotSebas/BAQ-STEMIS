@@ -4,6 +4,7 @@ void motores(int izq, int der) {
   izq = constrain(izq, -255, 255);
   der = constrain(der, -255, 255);
 
+
   digitalWrite(izq1, izq >= 0); digitalWrite(izq2, izq < 0);
   analogWrite(pwma, abs(izq));
 
@@ -12,14 +13,14 @@ void motores(int izq, int der) {
 }
 
 void seguirRecto() {
-  motores(vmin, vmin);
+  motores(vmin-20, vmin);
   delay(INTERSECCION_DELAY);
 }
 
 void girar(int dir) {
   // dir = 1 (derecha), dir = -1 (izquierda)
-  if (dir == 1) motores(150, -110);
-  else motores(-110, 150);
+  if (dir == 1) motores(110, -110);
+  else motores(-70, 150);
   delay(times);
   pararMotores();
 }

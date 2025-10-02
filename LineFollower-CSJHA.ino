@@ -21,7 +21,11 @@ void setup() {
 
   Serial.begin(115200);
   loadEEPROM();
-  
+
+  while (digitalRead(BOTON)) {
+    readSerial();   // tu función maneja todo
+  }
+
   tone(PINBUZZER, 2000, 100);
   digitalWrite(LED_ON, HIGH);
 
@@ -29,12 +33,12 @@ void setup() {
   digitalWrite(LED, HIGH);
   Serial.println("Coloca los sensores sobre fondo y presiona el botón...");
   esperarBoton();
-  for(int i = 0; i < 50; i++) { leerFondos(); parpadeoLED(); }
+  for(int i = 0; i < 80; i++) { leerFondos(); parpadeoLED(); }
   tone(PINBUZZER, 2000, 80);
 
   Serial.println("Coloca los sensores sobre línea y presiona el botón...");
   esperarBoton();
-  for(int i = 0; i < 50; i++) { leerLineas(); parpadeoLED(); }
+  for(int i = 0; i < 80; i++) { leerLineas(); parpadeoLED(); }
   tone(PINBUZZER, 2000, 80);
 
   calcularUmbral();

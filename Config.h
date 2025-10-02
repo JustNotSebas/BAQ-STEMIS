@@ -42,16 +42,16 @@ extern float PID_integral, PID_prev_error, PID_derivative;
 extern float setpoint;
 
 // PID defaults
-const float KPDF = 0.18;
-const float KIDF = 0.002;
-const float KDDF = 0.7;
-const float KVDF = 7.0;
+const float KPDF = 0.1765;
+const float KIDF = 0.001;
+const float KDDF = 0.69;
+const float KVDF = 5;
 
 // Motores defaults
-const int VMINDF = 70;
-const int VMAXDF = 80;
-const int FVUPDF = 150;
-const int FVDOWNDF = 110;
+const int VMINDF = 80;
+const int VMAXDF = 130;
+const int FVUPDF = 180;
+const int FVDOWNDF = 140;
 
 // Motores
 extern int vmin, vmax, fvup, fvdown, vbase;

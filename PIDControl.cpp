@@ -18,5 +18,5 @@ void calcularPID(float pos) {
   vbase = vmin + (vmax - vmin) * exp(-KV * abs(KP * error));
 
   // Llamada al módulo de motores
-  motores(vbase + salida, vbase - salida);
+  motores(vbase + salida - 30, vbase - salida);
 }

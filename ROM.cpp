@@ -51,10 +51,10 @@ void loadEEPROM() {
   EEPROM.get(addrFVdown,fvdown);
 
   Serial.println("Configuración cargada desde EEPROM:");
-  Serial.print("KP=");    Serial.println(KP, 6);
-  Serial.print("KI=");    Serial.println(KI, 6);
-  Serial.print("KD=");    Serial.println(KD, 6);
-  Serial.print("KV=");    Serial.println(KV, 6);
+  Serial.print("KP=");    Serial.println(KP, 4);
+  Serial.print("KI=");    Serial.println(KI, 4);
+  Serial.print("KD=");    Serial.println(KD, 4);
+  Serial.print("KV=");    Serial.println(KV, 4);
   Serial.print("vmin=");  Serial.println(vmin);
   Serial.print("vmax=");  Serial.println(vmax);
   Serial.print("fvup=");  Serial.println(fvup);
@@ -75,6 +75,17 @@ void resetConfig() {
   Serial.println("Configuración reseteada a valores por defecto.");
 }
 
+void printConfig(){
+  Serial.println("Configuración actualmente en memoria:");
+  Serial.print("KP=");    Serial.println(KP, 4);
+  Serial.print("KI=");    Serial.println(KI, 4);
+  Serial.print("KD=");    Serial.println(KD, 4);
+  Serial.print("KV=");    Serial.println(KV, 4);
+  Serial.print("vmin=");  Serial.println(vmin);
+  Serial.print("vmax=");  Serial.println(vmax);
+  Serial.print("fvup=");  Serial.println(fvup);
+  Serial.print("fvdown=");Serial.println(fvdown);
+}
 // --- Procesamiento de comandos ---
 void processCommand(String cmd) {
   if (cmd.startsWith("set ")) {
@@ -100,7 +111,8 @@ void processCommand(String cmd) {
         Serial.print("Parámetro actualizado: ");
         Serial.print(param);
         Serial.print(" = ");
-        Serial.println(val, 6);
+        Serial.println(val, 4);
+        saveEEPROM();
       } else {
         Serial.print("Parámetro desconocido: ");
         Serial.println(param);
@@ -113,7 +125,10 @@ void processCommand(String cmd) {
   } else if (cmd == "reset") {
     resetConfig();
     saveEEPROM();
-  } else {
+  } else if (cmd == "current"){
+    printConfig();
+    }
+  else {
     Serial.println("Comando no reconocido.");
   }
 }
