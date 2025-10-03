@@ -14,6 +14,8 @@ float KD = KDDF;
 float KV = KVDF;
 float PID_integral = 0, PID_prev_error = 0, PID_derivative = 0;
 float setpoint = 350.0;
+unsigned long PID_last_time = 0;
+float PID_output_limit = 150.0;  // Maximum PID output
 
 // --- Motores ---
 int vmin = VMINDF;

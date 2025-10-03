@@ -57,9 +57,14 @@ void loop() {
       en_interseccion = true;
       tiempo_interseccion = millis();
       pararMotores();
+      resetPID();  // Reset PID state when entering intersection
       tomarDecision();
     }
   } else {
+    if (en_interseccion) {
+      // Just exited intersection, reset PID for clean restart
+      resetPID();
+    }
     en_interseccion = false;
     calcularPID(pos);
     frenos(pos);
