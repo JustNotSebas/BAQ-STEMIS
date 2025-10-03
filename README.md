@@ -34,7 +34,7 @@ Utils.h  Sensors.h Motors.h
 ## Work(s) in progress
 
 - [X] Modularize the program (This repo!)
-- [ ] Reset windup when the car is relocated (PIDControl.cpp)
+- [X] Reset windup when the car is relocated (PIDControl.cpp)
 - [X] Modify kPIDV through Serial without recompiling (ROM.h and ROM.cpp)
 - [ ] Rewrite frenos() function to make slow turns to last known location (Motors.cpp)
 - [ ] Remake 90° and 45° turns system (Intersections.cpp)

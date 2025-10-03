@@ -40,12 +40,16 @@ extern uint8_t digital[8];
 extern float KP, KI, KD, KV;
 extern float PID_integral, PID_prev_error, PID_derivative;
 extern float setpoint;
+extern unsigned long PID_last_time;
+extern float PID_output_limit;
 
 // PID defaults
 const float KPDF = 0.1765;
 const float KIDF = 0.001;
 const float KDDF = 0.69;
 const float KVDF = 5;
+const float DERIVATIVE_FILTER_COEF = 0.7;  // Low-pass filter for derivative
+const int MOTOR_OFFSET = 30;  // Offset applied to left motor
 
 // Motores defaults
 const int VMINDF = 80;
