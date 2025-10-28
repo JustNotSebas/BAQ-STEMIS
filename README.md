@@ -42,8 +42,4 @@ Utils.h  Sensors.h Motors.h
 ## Runup
 
 This is one of the projects I've spent the most love (and hate) on it. And even though this is my last year at the Skill Challenge Robotica (at least with my current team- God knows what I'll do in the future), it's also good to be saving this for posperity.
-My previous repository, single files, which contains my work for the year 2024 and this one's (up to September 2025) can be found [here](https://github.com/JustNotSebas/SKCHRobotica).
-
-
-
-
+~~My previous repository, single files, which contains my work for the year 2024 and this one's (up to September 2025) can be found [here](https://github.com/JustNotSebas/SKCHRobotica).~~ (Old repository was deleted for organization purposes)
